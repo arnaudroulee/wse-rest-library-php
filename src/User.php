@@ -18,12 +18,14 @@ class User extends Wowza
     {
         parent::__construct($settings);
         $this->userName = $userName;
-        $this->restURI = $this->getHost() . "/servers/" . $this->getServerInstance() . "/users";
+        $this->baseUrl = $this->getHost() . "/servers/" . $this->getServerInstance() . "/users";
     }
 
     public function create($password, $group = [])
     {
-        $this->password = $password;
+        $this->restURI = $this->baseUrl;
+
+    	$this->password = $password;
         $this->groups = $group;
         $response = $this->sendRequest($this->preparePropertiesForRequest(self::class), []);
 
@@ -32,7 +34,9 @@ class User extends Wowza
 
     public function getAll()
     {
-        $this->addSkipParameter('userName', true) //todo: is this key correct??
+		$this->restURI = $this->baseUrl;
+
+    	$this->addSkipParameter('userName', true) //todo: is this key correct??
             ->addSkipParameter('password', true)
             ->addSkipParameter('group', true);
 
@@ -41,7 +45,7 @@ class User extends Wowza
 
     public function remove()
     {
-        $this->restURI = $this->restURI . "/" . $this->userName;
+        $this->restURI = $this->baseUrl . "/" . $this->userName;
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_DELETE);
     }

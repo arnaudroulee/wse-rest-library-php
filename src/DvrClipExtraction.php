@@ -12,27 +12,31 @@ class DvrClipExtraction extends Wowza
     public function __construct(Settings $settings, $appName, $appInstance = "_definst_")
     {
         parent::__construct($settings);
-        $this->restURI = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/applications/{$appName}/instances/{$appInstance}/dvrstores";
+
+        $this->baseUrl = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/applications/{$appName}/instances/{$appInstance}/dvrstores";
     }
 
     public function create()
     {
-        $response = $this->sendRequest($this->preparePropertiesForRequest(self::class), []);
+        $this->restURI = $this->baseUrl;
+
+    	$response = $this->sendRequest($this->preparePropertiesForRequest(self::class), []);
 
         return $response;
     }
 
     public function getItem($name)
     {
-        $this->restURI = $this->restURI . "/" . $name;
+        $this->restURI = $this->baseUrl . "/" . $name;
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function convertGroup($nameArr)
     {
-        $this->setNoParams();
-        $this->restURI = $this->restURI . "/actions/convert?dvrConverterStoreList=" . implode(",", $nameArr);
+		$this->restURI = $this->baseUrl . "/actions/convert?dvrConverterStoreList=" . implode(",", $nameArr);
+
+		$this->setNoParams();
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_PUT);
     }
@@ -68,21 +72,21 @@ class DvrClipExtraction extends Wowza
         }
         $query = (strlen($query) == 0) ? "" : "?" . $query;
 
-        $this->restURI = $this->restURI . "/{$name}/actions/convert{$query}";
+        $this->restURI = $this->base . "/{$name}/actions/convert{$query}";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_PUT);
     }
 
     public function clearCache()
     {
-        $this->restURI = $this->restURI . "/actions/expire";
+        $this->restURI = $this->baseUrl . "/actions/expire";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_PUT);
     }
 
     public function debugConversions($name)
     {
-        $this->restURI = $this->restURI . "/{$name}/actions/convert?dvrConverterDebugConversions=true";
+        $this->restURI = $this->baseUrl . "/{$name}/actions/convert?dvrConverterDebugConversions=true";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_PUT);
     }
@@ -110,7 +114,8 @@ class DvrClipExtraction extends Wowza
             $query .= "dvrConverterOutputFilename=" . $outputFileName;
         }
         $query = (strlen($query) == 1) ? "" : "?" . $query;
-        $this->restURI = $this->restURI . "/{$name}/actions/convert{$query}";
+
+        $this->restURI = $this->baseUrl . "/{$name}/actions/convert{$query}";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_PUT);
     }
@@ -135,14 +140,17 @@ class DvrClipExtraction extends Wowza
             $query .= "dvrConverterOutputFilename=" . $outputFileName;
         }
         $query = (strlen($query) == 1) ? "" : "?" . $query;
-        $this->restURI = $this->restURI . "/{$name}/actions/convert{$query}";
+
+        $this->restURI = $this->baseUrl . "/{$name}/actions/convert{$query}";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_PUT);
     }
 
     public function getAll()
     {
-        $this->setNoParams();
+		$this->restURI = $this->baseUrl;
+
+    	$this->setNoParams();
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
@@ -153,8 +161,9 @@ class DvrClipExtraction extends Wowza
 
     public function remove($fileName)
     {
-        $this->setNoParams();
-        $this->restURI = $this->restURI . "/" . $fileName;
+		$this->restURI = $this->baseUrl . "/" . $fileName;
+
+    	$this->setNoParams();
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_DELETE);
     }

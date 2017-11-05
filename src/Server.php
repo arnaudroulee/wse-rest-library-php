@@ -14,12 +14,13 @@ class Server extends Wowza
         Settings $settings
     ) {
         parent::__construct($settings);
-        $this->restURI = "{$settings->getHost()}/servers/{$settings->getServerInstance()}";
+        $this->baseUrl = "{$settings->getHost()}/servers/{$settings->getServerInstance()}";
     }
 
     public function getUsers()
     {
-        $this->restURI .= "/users";
+        $this->restURI = $this->baseUrl . "/users";
+
         $entities = $this->getEntites([], $this->restURI);
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
@@ -27,7 +28,8 @@ class Server extends Wowza
 
     public function createUser($name, $password, $groups = [])
     {
-        $this->restURI .= "/users/{$name}";
+        $this->restURI = $this->baseUrl . "/users/{$name}";
+
         $this->addAdditionalParameter('name', $name)
             ->addAdditionalParameter('password', $password)
             ->addAdditionalParameter('groups', $groups);
@@ -39,13 +41,13 @@ class Server extends Wowza
 
     public function removeUser($name)
     {
-        $this->restURI .= "/users/{$name}";
+        $this->restURI = $this->baseUrl . "/users/{$name}";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_DELETE);
     }
 
-    public function getRestURI()
+    public function getBaseUrl()
     {
-        return $this->restURI;
+        return $this->baseUrl;
     }
 }

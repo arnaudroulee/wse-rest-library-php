@@ -16,6 +16,7 @@ class Wowza
     const VERB_PUT = 'PUT';
 
     protected $restURI = '';
+    protected $baseUrl = '';
     private $_skip = [];
     private $_additional = [];
 
@@ -24,6 +25,8 @@ class Wowza
     public function __construct(Settings $settings)
     {
         $this->settings = $settings;
+
+		$this->addSkipParameter('baseUrl', true);
     }
 
     protected function getHost()
@@ -66,19 +69,34 @@ class Wowza
         return $entities;
     }
 
-    protected function debug($str)
+    protected function debugRequest($str)
     {
-        if ($this->settings->isDebug()) {
-            if (!is_string($str)) {
-                $str = json_encode($str);
-            }
-            echo $str . "\n";
-        }
+		$this->settings->setDebugRequest($str);
+
+		if ($this->settings->isDebug()) {
+			$str = json_encode($str);
+
+			echo $str . "\n";
+		}
     }
+
+	protected function debugResult($str)
+	{
+		$this->settings->setDebugResult($str);
+
+		if ($this->settings->isDebug()) {
+			$str = json_encode($str);
+
+			echo $str . "\n";
+		}
+	}
 
     protected function sendRequest($props, $entities, $verbType = self::VERB_POST, $queryParams = null)
     {
-        if (isset($props->restURI) && !empty($props->restURI)) {
+		$this->settings->setDebugRequest(null);
+		$this->settings->setDebugResult(null);
+
+    	if (isset($props->restURI) && !empty($props->restURI)) {
             $entityCount = count($entities);
             if ($entityCount > 0) {
                 for ($i = 0; $i < $entityCount; $i++) {
@@ -95,7 +113,11 @@ class Wowza
             if (null !== $queryParams) {
                 $restURL .= '?' . $queryParams;
             }
-            $this->debug("JSON REQUEST to {$restURL} with verb {$verbType}: " . $json);
+            $this->debugRequest([
+            	'url' => $restURL,
+            	'method' => $verbType,
+            	'data' => $json,
+			]);
 
             $ch = curl_init($restURL);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $verbType);
@@ -116,7 +138,9 @@ class Wowza
             $contents = curl_exec($ch);
             curl_close($ch);
 
-            $this->debug("RETURN: " . $contents);
+            $this->debugResult([
+				'data' => json_decode($contents),
+			]);
 
             return json_decode($contents);
         }

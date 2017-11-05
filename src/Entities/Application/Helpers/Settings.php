@@ -25,6 +25,12 @@ class Settings
     /** @var bool */
     private $useDigest;
 
+    /** @var string */
+    private $debugRequest = null;
+
+    /** @var string */
+    private $debugResult = null;
+
     /**
      * Settings constructor.
      *
@@ -221,4 +227,57 @@ class Settings
 
         return $this;
     }
+
+	/**
+	 * Get DebugResult.
+	 *
+	 * @return string
+	 */
+	public function getDebugResult()
+	{
+		return $this->debugResult;
+	}
+
+	/**
+	 * Set DebugResult.
+	 *
+	 * @param $debugResult
+	 *
+	 * @return Settings
+	 */
+	public function setDebugResult($debugResult)
+	{
+		$this->debugResult = $debugResult;
+
+		return $this;
+	}
+
+	/**
+	 * Get DebugRequest.
+	 *
+	 * @return string
+	 */
+	public function getDebugRequest()
+	{
+		return $this->debugRequest;
+	}
+
+	/**
+	 * Set DebugRequest.
+	 *
+	 * @param $debugRequest
+	 *
+	 * @return Settings
+	 */
+	public function setDebugRequest($debugRequest)
+	{
+		$this->debugRequest = $debugRequest;
+
+		return $this;
+	}
+
+
+
+
+
 }

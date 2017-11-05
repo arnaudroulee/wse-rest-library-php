@@ -12,26 +12,26 @@ class Logging extends Wowza
     public function __construct(Settings $settings)
     {
         parent::__construct($settings);
-        $this->restURI = $this->getHost() . "/servers/" . $this->getServerInstance() . "/logfiles";
+        $this->baseUrl = $this->getHost() . "/servers/" . $this->getServerInstance() . "/logfiles";
     }
 
     public function getNewestFirst()
     {
-        $this->restURI = $this->restURI . "?order=newestFirst";
+        $this->restURI = $this->baseUrl . "?order=newestFirst";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function getLineCount($num)
     {
-        $this->restURI = $this->restURI . "/wowzastreamingengine_access.log?lineCount={$num}";
+        $this->restURI = $this->baseUrl . "/wowzastreamingengine_access.log?lineCount={$num}";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function search($str)
     {
-        $this->restURI = $this->restURI . "/wowzastreamingengine_access.log?search=" . $str;
+        $this->restURI = $this->baseUrl . "/wowzastreamingengine_access.log?search=" . $str;
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }

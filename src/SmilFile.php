@@ -15,12 +15,13 @@ class SmilFile extends Wowza
     public function __construct(Settings $settings, $appName)
     {
         parent::__construct($settings);
-        $this->restURI = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/applications/" . $appName . "/smilfiles";
+        $this->baseUrl = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/applications/" . $appName . "/smilfiles";
     }
 
     public function create($fileName, $streams)
     {
-        $this->restURI = $this->restURI . "/" . $fileName;
+        $this->restURI = $this->baseUrl . "/" . $fileName;
+
         $this->smilStreams = $streams;
 
         $response = $this->sendRequest($this->preparePropertiesForRequest(self::class), []);
@@ -30,23 +31,27 @@ class SmilFile extends Wowza
 
     public function get($fileName)
     {
-        $this->addSkipParameter('smilStreams', true);
-        $this->restURI = $this->restURI . "/" . $fileName;
+		$this->restURI = $this->baseUrl . "/" . $fileName;
+
+    	$this->addSkipParameter('smilStreams', true);
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function getAll()
     {
-        $this->addSkipParameter('smilStreams', true);
+		$this->restURI = $this->baseUrl;
+
+    	$this->addSkipParameter('smilStreams', true);
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function remove($fileName)
     {
-        $this->addSkipParameter('smilStreams', true);
-        $this->restURI = $this->restURI . '/' . $fileName;
+		$this->restURI = $this->baseUrl . "/" . $fileName;
+
+    	$this->addSkipParameter('smilStreams', true);
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_DELETE);
     }

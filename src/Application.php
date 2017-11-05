@@ -29,7 +29,7 @@ class Application extends Wowza
         $this->clientStreamReadAccess = $clientStreamReadAccess;
         $this->clientStreamWriteAccess = $clientStreamWriteAccess;
         $this->description = $description;
-        $this->restURI = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/applications/{$name}";
+        $this->baseUrl = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/applications/{$name}";
     }
 
     private function setParameters()
@@ -44,18 +44,20 @@ class Application extends Wowza
 
     public function get()
     {
-        $this->setParameters();
+        $this->restURI = $this->baseUrl;
+
+    	$this->setParameters();
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function getAll()
     {
-        $this->setParameters();
-
         $this->restURI = $this->getHost() . '/servers/' . $this->getServerInstance() . '/vhosts/' . $this->getVHostInstance() . '/applications';
 
-        return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
+		$this->setParameters();
+
+		return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function create(
@@ -66,6 +68,8 @@ class Application extends Wowza
         Entities\Application\TranscoderConfig $transConfig = null,
         Entities\Application\DrmConfig $drmConfig = null
     ) {
+		$this->restURI = $this->baseUrl;
+
         $entities = $this->getEntites(func_get_args(), $this->restURI);
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), $entities);
@@ -79,19 +83,23 @@ class Application extends Wowza
         Entities\Application\TranscoderConfig $transConfig = null,
         Entities\Application\DrmConfig $drmConfig = null
     ) {
-        $entities = $this->getEntites(func_get_args(), $this->restURI);
+		$this->restURI = $this->baseUrl;
+
+    	$entities = $this->getEntites(func_get_args(), $this->restURI);
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), $entities, self::VERB_PUT);
     }
 
     public function remove()
     {
-        return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_DELETE);
+		$this->restURI = $this->baseUrl;
+
+    	return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_DELETE);
     }
 
-    public function getRestURI()
+    public function getBaseUrl()
     {
-        return $this->restURI;
+        return $this->baseUrl;
     }
 
     public function getName()

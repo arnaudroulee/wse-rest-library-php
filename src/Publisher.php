@@ -16,12 +16,14 @@ class Publisher extends Wowza
     {
         parent::__construct($settings);
         $this->name = $publisherName;
-        $this->restURI = $this->getHost() . "/servers/" . $this->getServerInstance() . "/publishers";
+        $this->baseUrl = $this->getHost() . "/servers/" . $this->getServerInstance() . "/publishers";
     }
 
     public function create($password)
     {
-        $this->password = $password;
+        $this->restURI = $this->baseUrl;
+
+    	$this->password = $password;
         $response = $this->sendRequest($this->preparePropertiesForRequest(self::class), []);
 
         return $response;
@@ -29,7 +31,9 @@ class Publisher extends Wowza
 
     public function getAll()
     {
-        $this->addSkipParameter('name', true)
+		$this->restURI = $this->baseUrl;
+
+    	$this->addSkipParameter('name', true)
             ->addSkipParameter('password', true);
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
@@ -37,7 +41,7 @@ class Publisher extends Wowza
 
     public function remove()
     {
-        $this->restURI = $this->restURI . "/" . $this->name;
+        $this->restURI = $this->baseUrl . "/" . $this->name;
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_DELETE);
     }

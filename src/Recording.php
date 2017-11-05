@@ -34,7 +34,7 @@ class Recording extends Wowza
     public function __construct(Settings $settings)
     {
         parent::__construct($settings);
-        $this->restURI = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/_defaultVHost_/applications/live/instances/_definst_/streamrecorders";
+        $this->baseUrl = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/_defaultVHost_/applications/live/instances/_definst_/streamrecorders";
     }
 
     public function create(
@@ -60,6 +60,7 @@ class Recording extends Wowza
         $currentDuration,
         $recordingStartTime
     ) {
+		$this->restURI = $this->baseUrl;
 
         $this->recordName = $recordName;
         $this->instanceName = $instanceName;
@@ -90,14 +91,17 @@ class Recording extends Wowza
 
     public function getAll()
     {
-        $this->setNoParams();
+		$this->restURI = $this->baseUrl;
+
+    	$this->setNoParams();
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function stop($recordName)
     {
-        $this->restURI = $this->restURI . "/" . $recordName . "/actions/stopRecording";
+        $this->restURI = $this->baseUrl . "/" . $recordName . "/actions/stopRecording";
+
         $this->setNoParams();
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_PUT);
@@ -105,7 +109,8 @@ class Recording extends Wowza
 
     public function split($recordName)
     {
-        $this->restURI = $this->restURI . "/" . $recordName . "/actions/splitRecording";
+        $this->restURI = $this->baseUrl . "/" . $recordName . "/actions/splitRecording";
+
         $this->setNoParams();
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_PUT);

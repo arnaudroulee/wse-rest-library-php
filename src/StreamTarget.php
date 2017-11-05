@@ -22,7 +22,7 @@ class StreamTarget extends Wowza
     public function __construct(Settings $settings, $appName)
     {
         parent::__construct($settings);
-        $this->restURI = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/applications/" . $appName . "/pushpublish/mapentries";
+        $this->baseUrl = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/applications/" . $appName . "/pushpublish/mapentries";
     }
 
     public function create(
@@ -35,7 +35,7 @@ class StreamTarget extends Wowza
         $streamName = null,
         $application = null
     ) {
-        $this->restURI = $this->restURI . "/" . $entryName;
+        $this->restURI = $this->baseUrl . "/" . $entryName;
         $this->sourceStreamName = (!is_null($sourceStreamName)) ? $sourceStreamName : $this->sourceStreamName;
         $this->entryName = (!is_null($entryName)) ? $entryName : $this->entryName;
         $this->profile = (!is_null($profile)) ? $profile : $this->profile;
@@ -52,7 +52,9 @@ class StreamTarget extends Wowza
 
     public function getAll()
     {
-        $this->setNoParams();
+		$this->restURI = $this->baseUrl;
+
+    	$this->setNoParams();
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
@@ -72,8 +74,9 @@ class StreamTarget extends Wowza
 
     public function remove($entryName)
     {
-        $this->setNoParams();
-        $this->restURI = $this->restURI . "/" . $entryName;
+		$this->restURI = $this->baseUrl . "/" . $entryName;
+
+    	$this->setNoParams();
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_DELETE);
     }

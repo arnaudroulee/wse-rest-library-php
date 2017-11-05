@@ -17,28 +17,28 @@ class Statistics extends Wowza
 
     public function getApplicationStatistics(Application $application)
     {
-        $this->restURI = $application->getRestURI() . "/monitoring/current";
+        $this->restURI = $application->getBaseUrl() . "/monitoring/current";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function getApplicationStatisticsHistory(Application $application)
     {
-        $this->restURI = $application->getRestURI() . "/monitoring/historic";
+        $this->restURI = $application->getBaseUrl() . "/monitoring/historic";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function getIncomingApplicationStatistics(Application $application, $streamName, $appInstance = "_definst_")
     {
-        $this->restURI = $application->getRestURI() . "/instances/{$appInstance}/incomingstreams/{$streamName}/monitoring/current";
+        $this->restURI = $application->getBaseUrl() . "/instances/{$appInstance}/incomingstreams/{$streamName}/monitoring/current";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function getServerStatistics(Server $server)
     {
-        $this->restURI = $server->getRestURI() . "/monitoring/historic";
+        $this->restURI = $server->getBaseUrl() . "/monitoring/historic";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }

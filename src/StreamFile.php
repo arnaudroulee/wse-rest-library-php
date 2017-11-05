@@ -23,7 +23,7 @@ class StreamFile extends Wowza
         $streamFileName = null
     ) {
         parent::__construct($settings);
-        $this->restURI = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/streamfiles";
+        $this->baseUrl = $this->getHost() . "/servers/" . $this->getServerInstance() . "/vhosts/" . $this->getVHostInstance() . "/streamfiles";
 
         if (!is_null($appName)) {
             $this->_applicationName = $appName;
@@ -36,15 +36,18 @@ class StreamFile extends Wowza
 
     public function get()
     {
-        $this->addSkipParameter('name', true);
-        $this->restURI .= "/" . $this->name;
+		$this->restURI = $this->baseUrl . "/" . $this->name;
+
+    	$this->addSkipParameter('name', true);
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
 
     public function getAll()
     {
-        $this->addSkipParameter('name', true);
+		$this->restURI = $this->baseUrl;
+
+    	$this->addSkipParameter('name', true);
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_GET);
     }
@@ -53,24 +56,24 @@ class StreamFile extends Wowza
     {
         $sf = new Entities\Application\StreamFiles();
         $sf->id = "connectAppName=" . $this->_applicationName . "&appInstance={$applicationInstance}&mediaCasterType={$mediaCasterType}";
-        $sf->href = $this->restURI . "/streamfiles/" . $sf->id;
+        $sf->href = $this->baseUrl . "/streamfiles/" . $sf->id;
 
         $entities = $this->getEntites([$sf], null);
-        $this->restURI = $this->restURI . "/" . $this->name;
+        $this->restURI = $this->baseUrl . "/" . $this->name;
         $response = $this->sendRequest($this->preparePropertiesForRequest(self::class), $entities);
         if ($response->success) {
             $items = $this->getAdvancedSettings($urlProps);
 
-            return $this->addURL($items);
+            return $this->addURL($items, $this->name);
         }
 
         return $response;
     }
 
-    private function addURL($advancedSettings)
+    private function addURL($advancedSettings, $name)
     {
         $this->addSkipParameter('name', 1);
-        $this->restURI .= '/adv';
+        $this->restURI = $this->baseUrl . "/" . $this->name . '/adv';
         $this->addAdditionalParameter('version', '1430601267443')
             ->addAdditionalParameter('advancedSettings', (array) $advancedSettings);
 
@@ -101,16 +104,16 @@ class StreamFile extends Wowza
 
     public function update($urlProps)
     {
-        $this->restURI = $this->restURI . "/" . $this->name;
+        $this->restURI = $this->baseUrl . "/" . $this->name;
         $items = $this->getAdvancedSettings($urlProps);
 
-        return $this->addURL($items);
+        return $this->addURL($items, $this->name);
     }
 
     public function remove()
     {
         $this->addSkipParameter('name', 1);
-        $this->restURI = $this->restURI . "/" . $this->name;
+        $this->restURI = $this->baseUrl . "/" . $this->name;
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_DELETE);
     }
@@ -122,7 +125,7 @@ class StreamFile extends Wowza
 // 		$this->_additional["appInstance"]=$this->_applicationInstance;
 // 		$this->_additional["mediaCasterType"]=$this->_mediaCasterType;
         $streamFilePath = (!empty($subFolder)) ? urlencode($subFolder . "/" . $this->name) : $this->name;
-        $this->restURI = $this->restURI . "/" . $streamFilePath . "/actions/connect";
+        $this->restURI = $this->baseUrl . "/" . $streamFilePath . "/actions/connect";
 
         return $this->sendRequest($this->preparePropertiesForRequest(self::class), [], self::VERB_PUT,
             "connectAppName=" . $this->_applicationName . "&appInstance=" . $this->_applicationInstance . "&mediaCasterType=" . $this->_mediaCasterType);
